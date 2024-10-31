@@ -84,3 +84,6 @@ PLANNED_UPDATES:
 
 - A configuration file used to change styling, colors, and fonts is going to be added to allow for more user personalization of the application
 
+
+
+![](https://imgur.com/a/V8ldi6J)
