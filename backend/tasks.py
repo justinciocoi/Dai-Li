@@ -3,13 +3,20 @@
 
 import json
 import os
+import sys
 from datetime import datetime, timedelta
 from PyQt5.QtWidgets import QListWidgetItem, QCheckBox
 from PyQt5.QtCore import QTimer
 
+
+
 class TaskManager:
     ## Constructor for Task Manager Class
     def __init__(self, tab1, tab2, tab3, parent):
+
+        self.data_directory_path = os.path.join(os.path.expanduser('~'), ".myAppData", "Dai-Li", "data")
+        self.task_file_path = os.path.join(self.data_directory_path, "tasks.json")
+        self.log_file_path = os.path.join(self.data_directory_path, "log.json")
         self.tab1 = tab1
         self.tab2 = tab2
         self.tab3 = tab3
@@ -17,8 +24,10 @@ class TaskManager:
         self.selected_item = None
         self.current_tab = 0
 
+        self.initialize_tasks_json()
+
         self.timer = QTimer()
-        with open("data/tasks.json", "r") as file:
+        with open(self.task_file_path, "r") as file:
             tasks = json.load(file)
 
         self.timer.timeout.connect(self.check_reset)
@@ -26,7 +35,7 @@ class TaskManager:
 
 
         self.check_reset_at_launch(tasks)
-        self.initialize_tasks_json()
+        
 
 
 
@@ -81,7 +90,7 @@ class TaskManager:
 
         try:
             # Load the entire JSON data
-            with open("data/tasks.json", "r+") as file:
+            with open(self.task_file_path, "r+") as file:
                 data = json.load(file)
                 data["tasks"] = tasks  # Update only the tasks section
 
@@ -92,7 +101,7 @@ class TaskManager:
 
         except FileNotFoundError:
             # Initialize JSON structure if file is missing
-            with open("data/tasks.json", "w") as file:
+            with open(self.task_file_path, "w") as file:
                 json.dump({
                     "tasks": tasks,
                     "last_reset": {"daily": "", "weekly": "", "monthly": ""}
@@ -102,7 +111,7 @@ class TaskManager:
 
     ##Saves reset data to json
     def save_reset_time(self, period):
-        with open("data/tasks.json", "r+") as file:
+        with open(self.task_file_path, "r+") as file:
             data = json.load(file)
             now = datetime.now()
 
@@ -139,10 +148,10 @@ class TaskManager:
 
     ## Function which loads in tasks
     def load_tasks(self):
-        if not os.path.exists("data/tasks.json"):
+        if not os.path.exists(self.task_file_path):
             return
         
-        with open("data/tasks.json", "r") as file:
+        with open(self.task_file_path, "r") as file:
             tasks = json.load(file)
 
         self.populate_tasks(self.tab1.task_list, tasks.get("tasks", {}).get("daily", []))
@@ -249,7 +258,7 @@ class TaskManager:
         """
         try:
             # Load the JSON data
-            with open("data/tasks.json", "r+") as file:
+            with open(self.task_file_path, "r+") as file:
                 data = json.load(file)
                 
                 # Access the specified period's tasks and reset checked status
@@ -278,18 +287,31 @@ class TaskManager:
     ## Function for initializing json file when not found
     def initialize_tasks_json(self):
         import os
-        if not os.path.exists("data/tasks.json"):
-            with open("data/tasks.json", "w") as file:
+        original_dir = os.getcwd()
+        os.chdir(self.data_directory_path)
+        if not os.path.exists("tasks.json"):
+            
+            with open("tasks.json", "w") as file:
                 json.dump({
                     "tasks": {"daily": [], "weekly": [], "monthly": []},
-                    "last_reset": {"daily": "", "weekly": "", "monthly": ""}
+                    "last_reset": {"daily": "1900-1-1", "weekly": "1900-1-1", "monthly": "1900-1"}
                 }, file, indent=4)
+
+        if not os.path.exists("log.json"):
+            with open("log.json", "w") as file:
+                json.dump({
+
+                }, file, indent=4)
+        
+        os.chdir(original_dir)
+
+            
 
 
 
     ## Convers tasks.json to 
     def convert_to_log_form(self, period):
-        with open("data/tasks.json", "r") as file:
+        with open(self.task_file_path, "r") as file:
             task_data = json.load(file)
 
         # Attempt to load existing log data, or initialize a new structure

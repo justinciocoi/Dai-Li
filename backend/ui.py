@@ -4,8 +4,17 @@
 from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, 
                              QTabWidget, QLabel, QLineEdit, QListWidget, QPushButton)
 from PyQt5.QtCore import Qt
+import sys, os
 from backend import helpers
 from backend import tasks
+
+if getattr(sys, 'frozen', False):  # Checks if running in a PyInstaller bundle
+    base_path = sys._MEIPASS  # Path to _MEIPASS in bundled app
+else:
+    base_path = os.path.dirname("main.py")  # Development path
+
+# Path to QSS (styling file) in _MEIPASS or project folder
+qss_path = os.path.join(base_path, "styles.qss")
 
 ## Class to define each tab of the app
 class Tab(QWidget):
@@ -62,7 +71,7 @@ class WeeklyApp(QMainWindow):
         self.setWindowTitle("Dai-Li")
         self.setGeometry(100, 100, 300, 500)
 
-        stylesheet = helpers.load_stylesheet("styling/styles.qss")
+        stylesheet = helpers.load_stylesheet(qss_path)
         self.setStyleSheet(stylesheet)
         self.spacer = QWidget()
         self.spacer.setGeometry(0,0,300,20)
