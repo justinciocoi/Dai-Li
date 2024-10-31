@@ -78,3 +78,9 @@ Your executable will be within the project directory but can be moved anywhere a
 
 KNOWN_BUGS
 
+PLANNED_UPDATES:
+
+- A log view is in the works where each task and period (daily/weekly/monthly) will return statistics relating to task completion over time. The log view will also allow users to specify dates between which statistics should be returned, but by default the entire subset of completion will be considered.
+
+- A configuration file used to change styling, colors, and fonts is going to be added to allow for more user personalization of the application
+
