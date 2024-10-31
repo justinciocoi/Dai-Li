@@ -2,5 +2,9 @@ __pycache__
 DaiLiEnv
 .DS_Store
 venv
-build
+build/
 Dai-Li.spec
+icon.icns
+dist/
+
+

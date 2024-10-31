@@ -111,7 +111,9 @@ class TaskManager:
 
     ##Saves reset data to json
     def save_reset_time(self, period):
-        with open(self.task_file_path, "r+") as file:
+        original_dir = os.getcwd()
+        os.chdir(self.data_directory_path)
+        with open("tasks.json", "r+") as file:
             data = json.load(file)
             now = datetime.now()
 
@@ -125,6 +127,8 @@ class TaskManager:
             file.seek(0)
             json.dump(data, file, indent=4)
             file.truncate()
+
+        os.chdir(original_dir)
 
 
 
@@ -256,9 +260,11 @@ class TaskManager:
         """
         Reset tasks directly in the JSON file by unchecking them, rather than updating the UI first.
         """
+        original_dir = os.getcwd()
+        os.chdir(self.data_directory_path)
         try:
             # Load the JSON data
-            with open(self.task_file_path, "r+") as file:
+            with open("tasks.json", "r+") as file:
                 data = json.load(file)
                 
                 # Access the specified period's tasks and reset checked status
@@ -281,6 +287,8 @@ class TaskManager:
             #self.log_data()
         except FileNotFoundError:
             print("tasks.json file not found. Unable to reset tasks.")
+
+        os.chdir(original_dir)
 
 
 
@@ -311,12 +319,14 @@ class TaskManager:
 
     ## Convers tasks.json to 
     def convert_to_log_form(self, period):
-        with open(self.task_file_path, "r") as file:
+        original_dir = os.getcwd()
+        os.chdir(self.data_directory_path)
+        with open("tasks.json", "r") as file:
             task_data = json.load(file)
 
         # Attempt to load existing log data, or initialize a new structure
         try:
-            with open("data/successRates.json", "r") as file:
+            with open("log.json", "r") as file:
                 log_data = json.load(file)
         except FileNotFoundError:
             log_data = {"daily": {}, "weekly": {}, "monthly": {}}
@@ -348,14 +358,20 @@ class TaskManager:
             # Update the last_update date
             log_data[period][task_name]["last_update"] = current_date
 
+        os.chdir(original_dir)
         return log_data
+    
+        
 
 
     def log_data(self, period):
+        original_dir = os.getcwd()
+        os.chdir(self.data_directory_path)
         data = self.convert_to_log_form(period)
-        with open("data/successRates.json", "w") as file:
+        with open("log.json", "w") as file:
             json.dump(data, file, indent=4)
 
+        os.chdir(original_dir)
 
 
 
